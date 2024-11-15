@@ -20,11 +20,11 @@ def plot_price_change_ratio(csv_path):
     # 设置中文字体
     font = FontProperties(fname='/System/Library/Fonts/Hiragino Sans GB.ttc')  # Mac系统自带的黑体
     
-    # 创建图表
-    plt.figure(figsize=(10, 6))
+    # 创建图表和第一个Y轴
+    fig, ax1 = plt.subplots(figsize=(12, 6))  # 调整图表大小
     
-    # 绘制主数据线
-    plt.plot(df['日期'], df['价格变动比'], 
+    # 绘制主数据线（降涨比）
+    line1 = ax1.plot(df['日期'], df['价格变动比'], 
              marker='o',
              linestyle='-',
              markerfacecolor='red',
@@ -33,47 +33,62 @@ def plot_price_change_ratio(csv_path):
              label='降涨比')
     
     # 添加比例10的红色参考线
-    plt.axhline(y=10, 
-                color='red',           # 设置为红色
-                linestyle='--',        # 虚线样式
-                alpha=0.8,             # 透明度
-                linewidth=1,           # 线宽
-                label='警戒线(10)')    # 添加图例标签
+    ax1.axhline(y=10, 
+                color='red',
+                linestyle='--',
+                alpha=0.8,
+                linewidth=1,
+                label='警戒线(10)')
     
-    # 添加图例
-    plt.legend(prop=font)  # 使用中文字体
+    # 创建第二个Y轴
+    ax2 = ax1.twinx()
     
-    # 设置标题和标签
-    plt.title('南京二手房降涨比（降价房源/涨价房源）', 
-             fontproperties=font,  # 使用字体
-             fontsize=14, 
-             pad=15)
-    plt.xlabel('日期', fontproperties=font)
-    plt.ylabel('降涨比', fontproperties=font)
+    # 绘制成交量柱状图
+    bars = ax2.bar(df['日期'], df['成交量'],
+            alpha=0.3,
+            color='gray',
+            label='成交量')
+    
+    # 设置左侧Y轴标签
+    ax1.set_ylabel('降涨比', fontproperties=font)
+    
+    # 设置右侧Y轴标签
+    ax2.set_ylabel('成交量', fontproperties=font)
+    
+    # 合并两个轴的图例
+    lines1, labels1 = ax1.get_legend_handles_labels()
+    lines2, labels2 = ax2.get_legend_handles_labels()
+    ax1.legend(lines1 + lines2, labels1 + labels2, prop=font, loc='upper left')
+    
+    # 设置标题
+    ax1.set_title('南京二手房降涨比与成交量', 
+                fontproperties=font,
+                fontsize=14, 
+                pad=15)
     
     # 添加网格线
-    plt.grid(True, linestyle='--', alpha=0.7)
+    ax1.grid(True, linestyle='--', alpha=0.7)
     
     # 添加水印
-    plt.text(0.5, 0.5, '水印',
+    ax1.text(0.5, 0.5, '水印',
              fontproperties=font,  # 使用字体
              fontsize=40,
              color='gray',
              alpha=0.2,
              ha='center',
              va='center',
-             transform=plt.gca().transAxes,
+             transform=ax1.transAxes,
              rotation=45)
     
     # 调整x轴显示
-    plt.xticks(rotation=45)
+    ax1.tick_params(axis='x', rotation=45)
     plt.tight_layout()
     
     # 获取当前日期
     current_date = datetime.now().strftime('%Y-%m-%d')
     
     # 保存图片
-    image_path = f"plot_njhouse_price_ratio.png"
+    image_path = f"plot_njhouse_bk_daily.png"
     plt.savefig(image_path, bbox_inches='tight')
     plt.close()
     

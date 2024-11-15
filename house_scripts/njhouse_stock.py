@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 import pandas as pd
 
@@ -40,7 +40,9 @@ def save_data_to_csv(data):
         # 获取北京时间
         beijing_tz = pytz.timezone('Asia/Shanghai')
         current_time = datetime.now(beijing_tz)
-        date_str = current_time.strftime('%Y-%m-%d')
+        # 获取前一天的日期
+        yesterday = current_time - timedelta(days=1)
+        date_str = yesterday.strftime('%Y-%m-%d')
         
         # 获取周几（使用中文表示）
         weekday_map = {
@@ -52,7 +54,7 @@ def save_data_to_csv(data):
             5: '周六',
             6: '周日'
         }
-        weekday = weekday_map[current_time.weekday()]
+        weekday = weekday_map[yesterday.weekday()]
         
         # 创建目录
         save_dir = 'njhouse_stock_daily'
