@@ -14,7 +14,16 @@ def run_scripts():
             print('\n开始执行总房源图表绘制...')
             subprocess.run(['python', 'plot_njhouse_stock.py'], check=True)
             print('总房源图表绘制成功')
-            print('\n所有任务执行完成！')
+            
+            # 3. 执行房价比例图表绘制
+            try:
+                print('\n开始执行房价比例图表绘制...')
+                subprocess.run(['python', 'plot_njhouse_price_ratio.py'], check=True)
+                print('房价比例图表绘制成功')
+                print('\n所有任务执行完成！')
+            except subprocess.CalledProcessError as e:
+                print(f'房价比例图表绘制失败: {str(e)}')
+                
         except subprocess.CalledProcessError as e:
             print(f'总房源图表绘制失败: {str(e)}')
             
