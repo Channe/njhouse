@@ -1,0 +1,5 @@
+# 在 GitHub 上忽略所有的 CSV 文件
+*.csv
+
+# 在 GitHub 上忽略 analyze_data 目录及其内容
+analyze_data/
