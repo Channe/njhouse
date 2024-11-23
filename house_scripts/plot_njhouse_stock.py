@@ -40,7 +40,7 @@ def plot_total_listings(csv_path):
     
     # 添加图例
     # 合并折线图和柱状图的图例
-    ax1.legend(line1 + [bars], ['总挂牌房源', '昨日住宅成交量'], loc='upper right')
+    ax1.legend(line1 + [bars], ['总挂牌房源', '昨日住宅成交量'], loc='upper left')
     
     # 设置x轴日期格式
     plt.gcf().autofmt_xdate()  # 自动调整日期标签角度
