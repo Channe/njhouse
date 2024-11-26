@@ -5,8 +5,12 @@ import os
 from matplotlib.font_manager import FontProperties
 
 def plot_price_change_ratio(csv_path):
-    # 读取CSV文件
+    # 读取房价数据
     df = pd.read_csv(csv_path, encoding='utf-8-sig')
+    
+    # 读取政策数据
+    policy_df = pd.read_csv('./njhouse_stock_daily/njhouse_policy.csv', encoding='utf-8-sig')
+    policy_df['日期'] = pd.to_datetime(policy_df['日期'])
     
     # 将日期列转换为日期类型
     df['日期'] = pd.to_datetime(df['日期'])
@@ -22,6 +26,19 @@ def plot_price_change_ratio(csv_path):
     
     # 创建图表和第一个Y轴
     fig, ax1 = plt.subplots(figsize=(12, 6))  # 调整图表大小
+    
+    # 在创建图表之后，绘制主数据线之前添加周末背景
+    # 获取周末的日期
+    weekend_mask = df['日期'].dt.dayofweek.isin([5, 6])  # 5是周六，6是周日
+    weekend_dates = df[weekend_mask]['日期']
+    
+    # 为每个周末日期添加垂直的背景色带
+    for date in weekend_dates:
+        ax1.axvspan(date - pd.Timedelta(hours=12),  # 向左偏移12小时
+                   date + pd.Timedelta(hours=12),  # 向右偏移12小时
+                   alpha=0.2,
+                   color='lightgray',
+                   label='周末' if date == weekend_dates.iloc[0] else "")  # 只在图例中显示一次
     
     # 绘制主数据线（降涨比）
     line1 = ax1.plot(df['日期'], df['价格变动比'], 
@@ -58,7 +75,18 @@ def plot_price_change_ratio(csv_path):
     # 合并两个轴的图例
     lines1, labels1 = ax1.get_legend_handles_labels()
     lines2, labels2 = ax2.get_legend_handles_labels()
-    ax1.legend(lines1 + lines2, labels1 + labels2, prop=font, loc='upper left')
+    
+    # 移除重复的周末图例（如果有的话）
+    unique_labels = []
+    unique_lines = []
+    seen_labels = set()
+    for line, label in zip(lines1 + lines2, labels1 + labels2):
+        if label not in seen_labels:
+            seen_labels.add(label)
+            unique_labels.append(label)
+            unique_lines.append(line)
+    
+    ax1.legend(unique_lines, unique_labels, prop=font, loc='upper left')
     
     # 设置标题
     ax1.set_title('南京二手房降涨比与成交量', 
@@ -83,6 +111,31 @@ def plot_price_change_ratio(csv_path):
     # 调整x轴显示
     ax1.tick_params(axis='x', rotation=45)
     plt.tight_layout()
+    
+    # 在图表上标注政策点
+    for idx, row in policy_df.iterrows():
+        # 找到政策日期对应的降涨比值
+        if row['日期'] in df['日期'].values:
+            y_value = df[df['日期'] == row['日期']]['价格变动比'].values[0]
+            
+            # 添加政策点标记
+            ax1.plot(row['日期'], y_value, 
+                    marker='*',
+                    markersize=15,
+                    color='red',
+                    zorder=5)
+            
+            # 添加政策说明文本
+            ax1.annotate(row['政策'],
+                        xy=(row['日期'], y_value),
+                        xytext=(10, 10),
+                        textcoords='offset points',
+                        fontproperties=font,
+                        fontsize=8,
+                        bbox=dict(boxstyle='round,pad=0.5',
+                                fc='yellow',
+                                alpha=0.5),
+                        arrowprops=dict(arrowstyle='->'))
     
     # 获取当前日期
     current_date = datetime.now().strftime('%Y-%m-%d')
