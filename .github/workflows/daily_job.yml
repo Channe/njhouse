@@ -1,0 +1,38 @@
+name: Daily House Data Update
+
+on:
+  push:
+    paths:
+      - 'house_scripts/njhouse_bk_daily.csv'
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  run-daily-jobs:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Run daily jobs script
+      run: |
+        cd house_scripts
+        python daily_jobs.py
+        
+    - name: Commit and push if changed
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add .
+        git commit -m "Update house data and plots" || exit 0
+        git push
