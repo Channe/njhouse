@@ -2,10 +2,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
 import os
+import matplotlib as mpl
 
 # 设置中文字体显示
-plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']  # 设置中文字体为黑体
-plt.rcParams['axes.unicode_minus'] = False     # 解决负号显示问题
+mpl.rcParams['font.sans-serif'] = ['Noto Sans CJK JP', 'Noto Sans CJK SC', 'DejaVu Sans']
+mpl.rcParams['axes.unicode_minus'] = False
+mpl.rcParams['font.family'] = 'sans-serif'
 
 def plot_total_listings(csv_path):
     # 读取CSV文件

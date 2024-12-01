@@ -2,7 +2,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
 import os
-from matplotlib.font_manager import FontProperties
+import matplotlib as mpl
+
+# 设置中文字体显示
+mpl.rcParams['font.sans-serif'] = ['Noto Sans CJK JP', 'Noto Sans CJK SC', 'DejaVu Sans']
+mpl.rcParams['axes.unicode_minus'] = False
+mpl.rcParams['font.family'] = 'sans-serif'
 
 def plot_price_change_ratio(csv_path):
     # 读取房价数据
@@ -20,9 +25,6 @@ def plot_price_change_ratio(csv_path):
     
     # 计算降价/涨价比值
     df['价格变动比'] = df['降价房源'] / df['涨价房源']
-    
-    # 设置中文字体
-    font = FontProperties(fname='/System/Library/Fonts/Hiragino Sans GB.ttc')  # Mac系统自带的黑体
     
     # 创建图表和第一个Y轴
     fig, ax1 = plt.subplots(figsize=(12, 6))  # 调整图表大小
@@ -67,10 +69,10 @@ def plot_price_change_ratio(csv_path):
             label='成交量')
     
     # 设置左侧Y轴标签
-    ax1.set_ylabel('降涨比', fontproperties=font)
+    ax1.set_ylabel('降涨比')
     
     # 设置右侧Y轴标签
-    ax2.set_ylabel('成交量', fontproperties=font)
+    ax2.set_ylabel('成交量')
     
     # 合并两个轴的图例
     lines1, labels1 = ax1.get_legend_handles_labels()
@@ -86,11 +88,10 @@ def plot_price_change_ratio(csv_path):
             unique_labels.append(label)
             unique_lines.append(line)
     
-    ax1.legend(unique_lines, unique_labels, prop=font, loc='upper left')
+    ax1.legend(unique_lines, unique_labels, loc='upper left')
     
     # 设置标题
     ax1.set_title('南京二手房降涨比与成交量', 
-                fontproperties=font,
                 fontsize=14, 
                 pad=15)
     
@@ -99,7 +100,6 @@ def plot_price_change_ratio(csv_path):
     
     # 添加水印
     ax1.text(0.5, 0.5, '水印',
-             fontproperties=font,  # 使用字体
              fontsize=40,
              color='gray',
              alpha=0.2,
@@ -130,7 +130,6 @@ def plot_price_change_ratio(csv_path):
                         xy=(row['日期'], y_value),
                         xytext=(10, 10),
                         textcoords='offset points',
-                        fontproperties=font,
                         fontsize=8,
                         bbox=dict(boxstyle='round,pad=0.5',
                                 fc='yellow',
