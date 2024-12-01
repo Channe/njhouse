@@ -7,6 +7,9 @@ on:
       - 'house_scripts/njhouse_policy.csv'
   workflow_dispatch:  # 允许手动触发
 
+permissions:
+  contents: write
+
 jobs:
   run-daily-jobs:
     runs-on: ubuntu-latest
@@ -41,4 +44,6 @@ jobs:
         git config --local user.name "github-actions[bot]"
         git add .
         git commit -m "Update house data and plots" || exit 0
-        git push
+        git push origin HEAD:${GITHUB_REF} --force
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
