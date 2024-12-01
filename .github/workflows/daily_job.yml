@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'house_scripts/njhouse_bk_daily.csv'
+      - 'house_scripts/njhouse_policy.csv'
   workflow_dispatch:  # 允许手动触发
 
 jobs:
