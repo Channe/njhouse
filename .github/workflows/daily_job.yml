@@ -3,8 +3,7 @@ name: Daily House Data Update
 on:
   push:
     paths:
-      - 'house_scripts/njhouse_bk_daily.csv'
-      - 'house_scripts/njhouse_policy.csv'
+      - 'house_scripts/**'
   workflow_dispatch:  # 允许手动触发
 
 permissions:
