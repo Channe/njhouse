@@ -3,13 +3,25 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import os
 import matplotlib as mpl
+import platform
 
-# 设置中文字体显示
-mpl.rcParams['font.sans-serif'] = ['Noto Sans CJK SC', 'DejaVu Sans']
-mpl.rcParams['axes.unicode_minus'] = False
-mpl.rcParams['font.family'] = 'sans-serif'
+# 根据操作系统设置合适的中文字体
+def set_font():
+    system = platform.system()
+    if system == 'Darwin':  # macOS
+        mpl.rcParams['font.sans-serif'] = ['PingFang SC', 'Heiti SC', 'Microsoft YaHei', 'Arial Unicode MS']
+    elif system == 'Linux':  # GitHub Actions (Ubuntu)
+        mpl.rcParams['font.sans-serif'] = ['Noto Sans CJK SC', 'Noto Sans CJK JP', 'DejaVu Sans']
+    else:  # Windows
+        mpl.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei']
+    
+    mpl.rcParams['axes.unicode_minus'] = False
+    mpl.rcParams['font.family'] = 'sans-serif'
 
 def plot_total_listings(csv_path):
+    # 设置字体
+    set_font()
+    
     # 读取CSV文件
     df = pd.read_csv(csv_path, encoding='utf-8-sig')
     policy_df = pd.read_csv('./njhouse_stock_daily/njhouse_policy.csv', encoding='utf-8-sig')
@@ -101,7 +113,7 @@ def plot_total_listings(csv_path):
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     
     # 保存图片
-    image_path = f"plot_njhouse_total_listings_{timestamp}.png"
+    image_path = f"plot_pngs/plot_njhouse_total_listings_{timestamp}.png"
     plt.savefig(image_path, bbox_inches='tight', dpi=300)
     plt.close()
     
