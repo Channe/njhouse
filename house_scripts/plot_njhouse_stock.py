@@ -5,7 +5,7 @@ import os
 import matplotlib as mpl
 
 # 设置中文字体显示
-mpl.rcParams['font.sans-serif'] = ['Noto Sans CJK JP', 'Noto Sans CJK SC', 'DejaVu Sans']
+mpl.rcParams['font.sans-serif'] = ['Noto Sans CJK SC', 'DejaVu Sans']
 mpl.rcParams['axes.unicode_minus'] = False
 mpl.rcParams['font.family'] = 'sans-serif'
 
@@ -97,12 +97,18 @@ def plot_total_listings(csv_path):
     # 调整布局
     plt.tight_layout()
     
+    # 获取当前日期时间戳
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    
     # 保存图片
-    image_path = "plot_njhouse_total_listings.png"
+    image_path = f"plot_njhouse_total_listings_{timestamp}.png"
     plt.savefig(image_path, bbox_inches='tight', dpi=300)
     plt.close()
     
     print(f"图表已保存为 {image_path}")
+    
+    # 返回生成的文件名，供 daily_jobs.py 使用
+    return image_path
 
 if __name__ == "__main__":
     csv_path = 'njhouse_stock_daily/njhouse_stock_daily.csv'

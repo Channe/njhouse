@@ -5,7 +5,7 @@ import os
 import matplotlib as mpl
 
 # 设置中文字体显示
-mpl.rcParams['font.sans-serif'] = ['Noto Sans CJK JP', 'Noto Sans CJK SC', 'DejaVu Sans']
+mpl.rcParams['font.sans-serif'] = ['Noto Sans CJK SC', 'DejaVu Sans']
 mpl.rcParams['axes.unicode_minus'] = False
 mpl.rcParams['font.family'] = 'sans-serif'
 
@@ -136,21 +136,18 @@ def plot_price_change_ratio(csv_path):
                                 alpha=0.5),
                         arrowprops=dict(arrowstyle='->'))
     
-    # 获取当前日期
-    current_date = datetime.now().strftime('%Y-%m-%d')
+    # 获取当前日期时间戳
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     
     # 保存图片
-    image_path = f"plot_njhouse_bk_daily.png"
+    image_path = f"plot_njhouse_bk_daily_{timestamp}.png"
     plt.savefig(image_path, bbox_inches='tight')
     plt.close()
     
     print(f"折线图已保存为 {image_path}")
     
-    # 打印统计信息
-    print("\n降涨比统计信息：")
-    print(f"平均降涨比：{df['价格变动比'].mean():.2f}")
-    print(f"最大降涨比：{df['价格变动比'].max():.2f}")
-    print(f"最小降涨比：{df['价格变动比'].min():.2f}")
+    # 返回生成的文件名，供 daily_jobs.py 使用
+    return image_path
 
 if __name__ == "__main__":
     csv_path = "njhouse_stock_daily/njhouse_bk_daily.csv"
