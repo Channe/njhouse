@@ -1,6 +1,6 @@
 ### TODO list
 1. [x] 启用github，csv 数据变更，自动更新图片
-   1. [ ] bug: 自动更新图片未触发
+   1. [ ] bug: csv 数据变更未触发 github action
    2. [x] bug: 图片名称没变，导致 readme 更新很慢
 2. [ ] 自动抓取贝壳数据，并保存为csv文件，当前为 App 手动截图获取数据
 3. [ ] 每日自动运行 daily_jobs.py 脚本，执行数据抓取、数据处理、图表绘制
