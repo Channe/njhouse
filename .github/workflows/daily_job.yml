@@ -41,6 +41,9 @@ jobs:
         done < house_scripts/BARK_SECRET_KEY.csv
 
     - name: Run daily jobs script
+      env:
+        BARK_SECRET_KEY: ${{ secrets.BARK_SECRET_KEY }}
+        BARK_SECRET_KEY_TINA: ${{ secrets.BARK_SECRET_KEY_TINA }}
       run: |
         cd house_scripts
         python daily_jobs.py
