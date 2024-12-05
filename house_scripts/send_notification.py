@@ -1,19 +1,16 @@
 import os
 import requests
-import pandas as pd
 
 def send_notification():
-    # 从 CSV 文件读取密钥
-    try:
-        df = pd.read_csv('BARK_SECRET_KEY.csv')
-        keys = df.iloc[:, 0].tolist()  # 读取第一列的所有值
-        
-        if not keys or len(keys) < 2:
-            print("Error: Not enough keys found in BARK_SECRET_KEY.csv")
-            return
-        
-    except Exception as e:
-        print(f"Error reading BARK_SECRET_KEY.csv: {e}")
+    # 获取环境变量中的密钥
+    keys = []
+    if os.getenv('BARK_SECRET_KEY'):
+        keys.append(os.getenv('BARK_SECRET_KEY'))
+    if os.getenv('BARK_SECRET_KEY_TINA'):
+        keys.append(os.getenv('BARK_SECRET_KEY_TINA'))
+    
+    if not keys:
+        print("Error: No BARK keys found in environment variables")
         return
     
     # 使用 requests.Session
