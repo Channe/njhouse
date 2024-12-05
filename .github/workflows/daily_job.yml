@@ -37,7 +37,7 @@ jobs:
       run: |
         echo "Reading secrets from CSV"
         while IFS=, read -r key; do
-          echo "$key=${{ secrets[$key] }}" >> $GITHUB_ENV
+          echo "$key=${{ secrets[key] }}" >> $GITHUB_ENV
         done < house_scripts/BARK_SECRET_KEY.csv
 
     - name: Run daily jobs script
