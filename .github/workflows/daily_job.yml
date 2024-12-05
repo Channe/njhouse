@@ -32,6 +32,14 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         
+    - name: Read secrets from CSV
+      id: read-secrets
+      run: |
+        echo "Reading secrets from CSV"
+        while IFS=, read -r key; do
+          echo "$key=${{ secrets[$key] }}" >> $GITHUB_ENV
+        done < house_scripts/BARK_SECRET_KEY.csv
+
     - name: Run daily jobs script
       run: |
         cd house_scripts

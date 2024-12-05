@@ -2,6 +2,21 @@
 
 import subprocess
 import re
+import csv
+import os
+
+def read_bark_keys():
+    """从 CSV 文件读取 BARK_SECRET_KEY"""
+    keys = {}
+    try:
+        with open('BARK_SECRET_KEY.csv', 'r') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if row:  # 确保行不为空
+                    keys[row[0]] = True  # 将每个密钥存储为字典的键
+    except Exception as e:
+        print(f'读取 BARK_SECRET_KEY.csv 失败: {str(e)}')
+    return keys
 
 def update_readme(bk_image_path, stock_image_path):
     """更新 README.md 中的图片链接"""
@@ -19,8 +34,23 @@ def update_readme(bk_image_path, stock_image_path):
         f.write(readme_content)
     
     print('README.md 更新成功')
+    
+    # 调用发送通知脚本
+    try:
+        subprocess.run(['python', 'send_notification.py'], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f'Failed to send notification: {str(e)}')
 
 def run_scripts():
+    # 读取 Bark 密钥
+    bark_keys = read_bark_keys()
+    if not bark_keys:
+        print('警告：未找到 BARK_SECRET_KEY')
+    
+    # 设置环境变量
+    for key_name in bark_keys:
+        os.environ[key_name] = os.getenv(key_name, '')  # 使用 GitHub Actions 中的密钥
+    
     bk_image_path = None
     stock_image_path = None
     
