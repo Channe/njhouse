@@ -111,7 +111,7 @@ def plot_price_change_ratio(csv_path):
     ax1.grid(True, linestyle='--', alpha=0.7)
     
     # 添加水印
-    ax1.text(0.5, 0.5, '水印',
+    ax1.text(0.5, 0.5, 'github.com/Channe/njhouse',
              fontsize=40,
              color='gray',
              alpha=0.2,
