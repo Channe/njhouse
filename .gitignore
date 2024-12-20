@@ -45,9 +45,5 @@ ENV/
 ehthumbs.db
 Thumbs.db
 
-# Project specific
-*.csv
-analyze_data/
-
 # Logs
 *.log
