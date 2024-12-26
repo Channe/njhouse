@@ -6,7 +6,7 @@ on:
       - 'house_scripts/**'
   workflow_dispatch:  # 允许手动触发
   schedule:           # 添加定时触发
-    - cron: '0 0 * * *'  # 每天 UTC 0 点触发（相当于北京时间 8 点）
+    - cron: '0 3 * * *'  # 每天 UTC 3 点触发（相当于北京时间 11 点）
 
 permissions:
   contents: write
