@@ -78,10 +78,19 @@ def save_data_to_csv(data):
             # 如果文件不存在，直接创建新文件
             df_new.to_csv(csv_path, index=False, encoding='utf-8-sig')
             
-        return True
+        return csv_path
     except Exception as e:
         print(f"保存数据时发生错误: {str(e)}")
-        return False
+        return None
+
+def clean_duplicate_data(csv_path):
+    # 检查并删除重复日期的数据
+    df = pd.read_csv(csv_path, encoding='utf-8-sig')
+    # 使用drop_duplicates方法删除重复的日期数据，保留最新的数据
+    df.drop_duplicates(subset=['日期'], keep='last', inplace=True)
+    # 将处理后的数据写回CSV文件
+    df.to_csv(csv_path, index=False, encoding='utf-8-sig')
+    print("数据已清洗，重复日期的数据已删除。")
 
 if __name__ == "__main__":
     result = get_house_data()
@@ -90,10 +99,14 @@ if __name__ == "__main__":
         for key, value in result.items():
             print(f"{key}: {value}")
         
-        # 保存数据
-        if save_data_to_csv(result):
-            print("\n数据已成功保存到 njhouse_stock_daily/njhouse_stock_daily.csv")
+        # 保存数据并获取CSV文件路径
+        csv_path = save_data_to_csv(result)
+        if csv_path:
+            print(f"\n数据已成功保存到 {csv_path}")
         else:
             print("\n数据保存失败")
+
+        # 清洗数据
+        clean_duplicate_data(csv_path)
     else:
         print(result)
