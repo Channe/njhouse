@@ -10,9 +10,16 @@ os.chdir(script_dir)
 
 def update_readme(bk_image_path, stock_image_path):
     """更新 README.md 中的图片链接"""
-    # 相对路径，从 ./house_scripts/ 开始
-    bk_relative_path = bk_image_path.replace('house_scripts/', '')
-    stock_relative_path = stock_image_path.replace('house_scripts/', '')
+    # 确保路径没有重复的house_scripts前缀
+    # 首先移除可能存在的house_scripts/前缀
+    bk_relative_path = bk_image_path
+    stock_relative_path = stock_image_path
+    
+    if bk_relative_path.startswith('house_scripts/'):
+        bk_relative_path = bk_relative_path[len('house_scripts/'):]
+    
+    if stock_relative_path.startswith('house_scripts/'):
+        stock_relative_path = stock_relative_path[len('house_scripts/'):]
     
     readme_content = f"""### 南京房产数据
 

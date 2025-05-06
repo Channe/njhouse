@@ -139,10 +139,10 @@ def plot_total_listings(csv_path):
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     
     # 确保目标目录存在
-    os.makedirs('house_scripts/plot_pngs', exist_ok=True)
+    os.makedirs('plot_pngs', exist_ok=True)
     
     # 保存图片
-    image_path = f"house_scripts/plot_pngs/plot_njhouse_total_listings_{timestamp}.png"
+    image_path = f"plot_pngs/plot_njhouse_total_listings_{timestamp}.png"
     plt.savefig(image_path, bbox_inches='tight', dpi=300)
     plt.close()
     
