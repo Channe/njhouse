@@ -1,6 +1,10 @@
 import os
 import requests
 
+# 切换到脚本所在目录
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
+
 def send_notification():
     # 获取环境变量中的密钥
     keys = []

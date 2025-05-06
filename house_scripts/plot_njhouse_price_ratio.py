@@ -5,6 +5,10 @@ import os
 import matplotlib as mpl
 import platform
 
+# 切换到脚本所在目录
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
+
 # 根据操作系统设置合适的中文字体
 def set_font():
     system = platform.system()
@@ -27,7 +31,7 @@ def plot_price_change_ratio(csv_path):
     
     # 读取政策数据
     try:
-        policy_df = pd.read_csv('house_scripts/njhouse_stock_daily/njhouse_policy.csv', encoding='utf-8-sig')
+        policy_df = pd.read_csv('njhouse_stock_daily/njhouse_policy.csv', encoding='utf-8-sig')
         policy_df['日期'] = pd.to_datetime(policy_df['日期'])
         has_policy_data = True
     except FileNotFoundError:
@@ -168,10 +172,10 @@ def plot_price_change_ratio(csv_path):
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     
     # 确保目标目录存在
-    os.makedirs('house_scripts/plot_pngs', exist_ok=True)
+    os.makedirs('plot_pngs', exist_ok=True)
     
     # 保存图片
-    image_path = f"house_scripts/plot_pngs/plot_njhouse_bk_daily_{timestamp}.png"
+    image_path = f"plot_pngs/plot_njhouse_bk_daily_{timestamp}.png"
     plt.savefig(image_path, bbox_inches='tight')
     plt.close()
     
@@ -181,7 +185,7 @@ def plot_price_change_ratio(csv_path):
     return image_path
 
 if __name__ == "__main__":
-    csv_path = "house_scripts/njhouse_stock_daily/njhouse_bk_daily.csv"
+    csv_path = "njhouse_stock_daily/njhouse_bk_daily.csv"
     if os.path.exists(csv_path):
         plot_price_change_ratio(csv_path)
     else:

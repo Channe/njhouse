@@ -5,6 +5,10 @@ import os
 import matplotlib as mpl
 import platform
 
+# 切换到脚本所在目录
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
+
 # 根据操作系统设置合适的中文字体
 def set_font():
     system = platform.system()
@@ -148,7 +152,7 @@ def plot_total_listings(csv_path):
     return image_path
 
 if __name__ == "__main__":
-    csv_path = 'house_scripts/njhouse_stock_daily/njhouse_stock_daily.csv'
+    csv_path = 'njhouse_stock_daily/njhouse_stock_daily.csv'
     if os.path.exists(csv_path):
         plot_total_listings(csv_path)
     else:

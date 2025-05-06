@@ -4,6 +4,10 @@ from PIL import Image
 import pandas as pd
 from datetime import datetime
 
+# 切换到脚本所在目录
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
+
 def extract_data_from_image(image_path):
     try:
         # 使用pytesseract从图片中提取文字
@@ -63,6 +67,14 @@ def process_images_in_directory(directory_path, csv_path):
 
 if __name__ == "__main__":
     image_directory = 'nj_bk_daily_pictures'
-    csv_path = 'nj_bk_daily.csv'
-    process_images_in_directory(image_directory, csv_path)
-    print("所有图片数据已处理并保存到 nj_bk_daily.csv")
+    csv_path = 'njhouse_stock_daily/njhouse_bk_daily.csv'
+    
+    # 确保目录存在
+    if not os.path.exists(image_directory):
+        print(f"警告：图片目录 {image_directory} 不存在")
+    else:
+        # 确保保存CSV的目录存在
+        os.makedirs(os.path.dirname(csv_path), exist_ok=True)
+        
+        process_images_in_directory(image_directory, csv_path)
+        print(f"所有图片数据已处理并保存到 {csv_path}")

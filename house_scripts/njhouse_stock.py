@@ -5,6 +5,10 @@ from datetime import datetime, timedelta
 import pytz
 import pandas as pd
 
+# 切换到脚本所在目录
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
+
 def get_house_data():
     url = "http://njzl.njhouse.com.cn/stock"
     headers = {

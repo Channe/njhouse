@@ -2,27 +2,39 @@
 
 import subprocess
 import os
+import sys
+
+# 切换到脚本所在目录
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
 
 def update_readme(bk_image_path, stock_image_path):
     """更新 README.md 中的图片链接"""
+    # 相对路径，从 ./house_scripts/ 开始
+    bk_relative_path = bk_image_path.replace('house_scripts/', '')
+    stock_relative_path = stock_image_path.replace('house_scripts/', '')
+    
     readme_content = f"""### 南京房产数据
 
 #### 贝壳每日成交量统计、降涨比
-![plot_njhouse_bk_daily](./house_scripts/{bk_image_path})
+![plot_njhouse_bk_daily](./house_scripts/{bk_relative_path})
 
 #### 南京房地产每日挂牌总量、成交量
-![plot_njhouse_total_listings](./house_scripts/{stock_image_path})
+![plot_njhouse_total_listings](./house_scripts/{stock_relative_path})
 """
     
+    # 使用项目根目录的相对路径
+    readme_path = os.path.join(os.path.dirname(script_dir), 'README.md')
+    
     # 写入更新后的内容
-    with open('../README.md', 'w', encoding='utf-8') as f:
+    with open(readme_path, 'w', encoding='utf-8') as f:
         f.write(readme_content)
     
     print('README.md 更新成功')
     
     # 调用发送通知脚本
     try:
-        subprocess.run(['python', 'send_notification.py'], check=True)
+        subprocess.run([sys.executable, 'send_notification.py'], check=True)
     except subprocess.CalledProcessError as e:
         print(f'Failed to send notification: {str(e)}')
 
@@ -40,13 +52,13 @@ def run_scripts():
     # 1. 执行数据抓取脚本
     try:
         print('\n开始执行南京房产数据抓取任务...')
-        subprocess.run(['python', 'njhouse_stock.py'], check=True)
+        subprocess.run([sys.executable, 'njhouse_stock.py'], check=True)
         print('南京房产数据抓取任务执行成功')
         
         # 2. 数据抓取成功后，执行总房源图表绘制
         try:
             print('\n开始执行总房源图表绘制...')
-            result = subprocess.run(['python', 'plot_njhouse_stock.py'], 
+            result = subprocess.run([sys.executable, 'plot_njhouse_stock.py'], 
                                  capture_output=True, 
                                  text=True,
                                  check=True)
@@ -56,7 +68,7 @@ def run_scripts():
             # 3. 执行房价比例图表绘制
             try:
                 print('\n开始执行房价比例图表绘制...')
-                result = subprocess.run(['python', 'plot_njhouse_price_ratio.py'],
+                result = subprocess.run([sys.executable, 'plot_njhouse_price_ratio.py'],
                                      capture_output=True,
                                      text=True,
                                      check=True)
