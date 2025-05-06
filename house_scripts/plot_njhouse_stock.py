@@ -24,11 +24,23 @@ def plot_total_listings(csv_path):
     
     # 读取CSV文件
     df = pd.read_csv(csv_path, encoding='utf-8-sig')
-    policy_df = pd.read_csv('./njhouse_stock_daily/njhouse_policy.csv', encoding='utf-8-sig')
     
+    try:
+        policy_df = pd.read_csv('house_scripts/njhouse_stock_daily/njhouse_policy.csv', encoding='utf-8-sig')
+        has_policy_data = True
+    except FileNotFoundError:
+        print("政策数据文件不存在，将不显示政策信息")
+        has_policy_data = False
+    
+    # 确保CSV数据类型正确
     # 确保日期列是datetime格式
     df['日期'] = pd.to_datetime(df['日期'])
-    policy_df['日期'] = pd.to_datetime(policy_df['日期'])
+    
+    # 确保总挂牌房源列是数值型
+    df['总挂牌房源'] = pd.to_numeric(df['总挂牌房源'], errors='coerce')
+    
+    # 处理昨日住宅成交量为空的情况
+    df['昨日住宅成交量'] = pd.to_numeric(df['昨日住宅成交量'], errors='coerce').fillna(0)
     
     # 按日期排序
     df = df.sort_values('日期')
@@ -58,32 +70,42 @@ def plot_total_listings(csv_path):
     ax2 = ax1.twinx()
     color2 = 'tab:red'
     ax2.set_ylabel('昨日住宅成交量', color=color2)
+    
     bars = ax2.bar(df['日期'], df['昨日住宅成交量'], alpha=0.3, color=color2, label='昨日住宅成交量')
     ax2.tick_params(axis='y', labelcolor=color2)
     
     # 标注政策点
-    for idx, row in policy_df.iterrows():
-        if row['日期'] in df['日期'].values:
-            # 获取政策日期对应的总挂牌房源数据
-            y_value = df[df['日期'] == row['日期']]['总挂牌房源'].values[0]
+    if has_policy_data:
+        # 确保政策日期是datetime格式
+        policy_df['日期'] = pd.to_datetime(policy_df['日期'])
+        
+        for idx, row in policy_df.iterrows():
+            policy_date = row['日期']
             
-            # 添加政策点标记
-            ax1.plot(row['日期'], y_value,
-                    marker='*',
-                    markersize=15,
-                    color='red',
-                    zorder=5)
+            # 查找匹配的数据点
+            matching_data = df[df['日期'] == policy_date]
             
-            # 添加政策说明文本
-            ax1.annotate(f"{row['政策']}\n{row['具体内容']}",
-                        xy=(row['日期'], y_value),
-                        xytext=(10, 10),
-                        textcoords='offset points',
-                        fontsize=8,
-                        bbox=dict(boxstyle='round,pad=0.5',
-                                fc='yellow',
-                                alpha=0.5),
-                        arrowprops=dict(arrowstyle='->'))
+            if not matching_data.empty:
+                # 获取政策日期对应的总挂牌房源数据
+                y_value = matching_data['总挂牌房源'].iloc[0]
+                
+                # 使用日期和数值绘制标记点
+                ax1.scatter(policy_date, y_value,
+                          marker='*',
+                          s=200,  # 相当于markersize=15的效果
+                          color='red',
+                          zorder=5)
+                
+                # 添加政策说明文本
+                ax1.annotate(f"{row['政策']}\n{row['具体内容']}",
+                            xy=(policy_date, y_value),
+                            xytext=(10, 10),
+                            textcoords='offset points',
+                            fontsize=8,
+                            bbox=dict(boxstyle='round,pad=0.5',
+                                    fc='yellow',
+                                    alpha=0.5),
+                            arrowprops=dict(arrowstyle='->'))
     
     # 设置标题
     plt.title('南京房市数据统计', fontsize=14, pad=15)
@@ -112,8 +134,11 @@ def plot_total_listings(csv_path):
     # 获取当前日期时间戳
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     
+    # 确保目标目录存在
+    os.makedirs('house_scripts/plot_pngs', exist_ok=True)
+    
     # 保存图片
-    image_path = f"plot_pngs/plot_njhouse_total_listings_{timestamp}.png"
+    image_path = f"house_scripts/plot_pngs/plot_njhouse_total_listings_{timestamp}.png"
     plt.savefig(image_path, bbox_inches='tight', dpi=300)
     plt.close()
     
@@ -123,8 +148,8 @@ def plot_total_listings(csv_path):
     return image_path
 
 if __name__ == "__main__":
-    csv_path = 'njhouse_stock_daily/njhouse_stock_daily.csv'
+    csv_path = 'house_scripts/njhouse_stock_daily/njhouse_stock_daily.csv'
     if os.path.exists(csv_path):
         plot_total_listings(csv_path)
     else:
-        print("CSV文件不存在，请检查路径。") 
+        print(f"CSV文件不存在，请检查路径: {csv_path}") 

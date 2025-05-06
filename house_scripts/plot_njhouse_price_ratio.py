@@ -26,8 +26,13 @@ def plot_price_change_ratio(csv_path):
     df = pd.read_csv(csv_path, encoding='utf-8-sig')
     
     # 读取政策数据
-    policy_df = pd.read_csv('./njhouse_stock_daily/njhouse_policy.csv', encoding='utf-8-sig')
-    policy_df['日期'] = pd.to_datetime(policy_df['日期'])
+    try:
+        policy_df = pd.read_csv('house_scripts/njhouse_stock_daily/njhouse_policy.csv', encoding='utf-8-sig')
+        policy_df['日期'] = pd.to_datetime(policy_df['日期'])
+        has_policy_data = True
+    except FileNotFoundError:
+        print("政策数据文件不存在，将不显示政策信息")
+        has_policy_data = False
     
     # 将日期列转换为日期类型
     df['日期'] = pd.to_datetime(df['日期'])
@@ -36,7 +41,13 @@ def plot_price_change_ratio(csv_path):
     df = df.sort_values('日期')
     
     # 计算降价/涨价比值
+    df['降价房源'] = pd.to_numeric(df['降价房源'], errors='coerce')
+    df['涨价房源'] = pd.to_numeric(df['涨价房源'], errors='coerce').replace(0, float('nan'))
     df['价格变动比'] = df['降价房源'] / df['涨价房源']
+    
+    # 替换无穷大值为NaN，并填充NaN值为0，使用推荐的写法避免警告
+    df['价格变动比'] = df['价格变动比'].replace([float('inf'), -float('inf')], float('nan'))
+    df['价格变动比'] = df['价格变动比'].fillna(0)
     
     # 创建图表和第一个Y轴
     fig, ax1 = plt.subplots(figsize=(12, 6))  # 调整图表大小
@@ -73,6 +84,9 @@ def plot_price_change_ratio(csv_path):
     
     # 创建第二个Y轴
     ax2 = ax1.twinx()
+    
+    # 转换成交量为数值并处理缺失值
+    df['成交量'] = pd.to_numeric(df['成交量'], errors='coerce').fillna(0)
     
     # 绘制成交量柱状图
     bars = ax2.bar(df['日期'], df['成交量'],
@@ -125,34 +139,39 @@ def plot_price_change_ratio(csv_path):
     plt.tight_layout()
     
     # 在图表上标注政策点
-    for idx, row in policy_df.iterrows():
-        # 找到政策日期对应的降涨比值
-        if row['日期'] in df['日期'].values:
-            y_value = df[df['日期'] == row['日期']]['价格变动比'].values[0]
-            
-            # 添加政策点标记
-            ax1.plot(row['日期'], y_value, 
-                    marker='*',
-                    markersize=15,
-                    color='red',
-                    zorder=5)
-            
-            # 添加政策说明文本
-            ax1.annotate(row['政策'],
-                        xy=(row['日期'], y_value),
-                        xytext=(10, 10),
-                        textcoords='offset points',
-                        fontsize=8,
-                        bbox=dict(boxstyle='round,pad=0.5',
-                                fc='yellow',
-                                alpha=0.5),
-                        arrowprops=dict(arrowstyle='->'))
+    if has_policy_data:
+        for idx, row in policy_df.iterrows():
+            # 找到政策日期对应的降涨比值
+            matching_data = df[df['日期'] == row['日期']]
+            if not matching_data.empty:
+                y_value = matching_data['价格变动比'].iloc[0]
+                
+                # 添加政策点标记
+                ax1.scatter(row['日期'], y_value, 
+                        marker='*',
+                        s=200,  # 相当于markersize=15
+                        color='red',
+                        zorder=5)
+                
+                # 添加政策说明文本
+                ax1.annotate(row['政策'],
+                            xy=(row['日期'], y_value),
+                            xytext=(10, 10),
+                            textcoords='offset points',
+                            fontsize=8,
+                            bbox=dict(boxstyle='round,pad=0.5',
+                                    fc='yellow',
+                                    alpha=0.5),
+                            arrowprops=dict(arrowstyle='->'))
     
     # 获取当前日期时间戳
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     
+    # 确保目标目录存在
+    os.makedirs('house_scripts/plot_pngs', exist_ok=True)
+    
     # 保存图片
-    image_path = f"plot_pngs/plot_njhouse_bk_daily_{timestamp}.png"
+    image_path = f"house_scripts/plot_pngs/plot_njhouse_bk_daily_{timestamp}.png"
     plt.savefig(image_path, bbox_inches='tight')
     plt.close()
     
@@ -162,8 +181,8 @@ def plot_price_change_ratio(csv_path):
     return image_path
 
 if __name__ == "__main__":
-    csv_path = "njhouse_stock_daily/njhouse_bk_daily.csv"
+    csv_path = "house_scripts/njhouse_stock_daily/njhouse_bk_daily.csv"
     if os.path.exists(csv_path):
         plot_price_change_ratio(csv_path)
     else:
-        print("CSV文件不存在，请检查路径。")
+        print(f"CSV文件不存在，请检查路径: {csv_path}")
